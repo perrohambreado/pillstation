@@ -44,3 +44,14 @@ def home(request):
 def logout(request):
     request.session.flush()
     return redirect('login')
+
+#ailton esp32
+
+from django.http import JsonResponse
+def esp32_endpoint(request):
+    data = {
+        "message": "Hola Esp32, Django esta funcionando correctamente "
+
+    }
+    return JsonResponse(data)
+
