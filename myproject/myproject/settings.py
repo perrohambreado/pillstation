@@ -86,6 +86,8 @@ DATABASES = {
             'password': 'pKW6Ir1kXLapHf5u',
             'authSource': 'admin',  
             'authMechanism': 'SCRAM-SHA-1', 
+            'tls': True,
+            'tlsAllowInvalidCertificates': True,
         }
     }
 }

@@ -7,17 +7,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnwect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="{% static 'userHome.css' %}">
     <title>PillStation</title>
 </head>
 <body>
   <header>
-    <h2>PillStation</h2>
-    <div class="nav-buttons">
-        <button onclick="window.location.href='{% url 'home' %}'">Sobre nosotros</button>
-        <button onclick="window.location.href='{% url 'home' %}'">Nuestros servicios</button>
-        <button onclick="window.location.href='{% url 'login' %}'">Iniciar sesión</button>
-    </div>
-</header>
+    <h2>
+      PillStation
+    </h2>
+    <button onclick="window.location.href='{% url 'home' %}'">
+      Sobre nosotros
+    </button>
+    <button onclick="window.location.href='{% url 'home' %}'">
+      Nuestros servicios
+    </button>
+    <button onclick="window.location.href='{% url 'login' %}'">
+      Iniciar sesión
+    </button>
+  </header>
 </body>
 </html>
