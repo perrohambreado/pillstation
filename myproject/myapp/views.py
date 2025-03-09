@@ -51,32 +51,13 @@ def logout(request):
     request.session.flush()
     return redirect('login')
 
-def index(request):
-    return render(request, 'index.html')
+#ailton esp32
 
-def agregar_paciente(request):
-    if request.method == 'POST':
-        form = PacienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_pacientes')
-    else:
-        form = PacienteForm()
-    return render(request, 'agregar_paciente.html', {'form': form})
+from django.http import JsonResponse
+def esp32_endpoint(request):
+    data = {
+        "message": "Hola Esp32, Django esta funcionando correctamente "
 
-def editar_paciente(request, id):
-    paciente = get_object_or_404(Paciente, id=id)
-    if request.method == 'POST':
-        form = PacienteForm(request.POST, instance=paciente)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_pacientes')
-    else:
-        form = PacienteForm(instance=paciente)
-    return render(request, 'editar_paciente.html', {'form': form})
-
-def eliminar_paciente(request, id):
-    paciente = get_object_or_404(Paciente, id=id)
-    paciente.delete()
-    return redirect('lista_pacientes')
+    }
+    return JsonResponse(data)
 
