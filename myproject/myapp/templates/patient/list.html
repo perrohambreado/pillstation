@@ -1,0 +1,21 @@
+{% block content %}
+  <h2>Lista de Pacientes</h2>
+  <table>
+    <tr>
+      <th>Fecha Ingreso</th>
+      <th>Fecha de Salida</th>
+      <th>Acciones</th>
+    </tr>
+    {% for paciente in pacientes %}
+      <tr>
+        <td>{{ paciente.fecha_ingreso }}</td>
+        <td>{{ paciente.fecha_de_salida }}</td>
+        <td>
+          <a href="{% url 'editar_paciente' paciente.id %}">Editar</a> | 
+          <a href="{% url 'eliminar_paciente' paciente.id %}">Eliminar</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <a href="{% url 'crear_paciente' %}">Crear Paciente</a>
+{% endblock %}

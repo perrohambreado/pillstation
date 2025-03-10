@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Horarios</title>
+</head>
+<body>
+    <h1>Lista de Horarios</h1>
+    <table>
+        <tr>
+            <th>Pastillero</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Medicamento</th>
+            <th>Dosis</th>
+            <th>Días</th>
+            <th>Acciones</th>
+        </tr>
+        {% for horario in horarios %}
+        <tr>
+            <td>{{ horario.pastillero.codigo }}</td>
+            <td>{{ horario.hora_inicio }}</td>
+            <td>{{ horario.hora_fin }}</td>
+            <td>{{ horario.medicamento }}</td>
+            <td>{{ horario.dosis }}</td>
+            <td>{{ horario.dias|join:", " }}</td>
+            <td>
+                <a href="{% url 'editar_horario' horario.pk %}">Editar</a> | 
+                <a href="{% url 'eliminar_horario' horario.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'crear_horario' %}">Crear nuevo horario</a>
+</body>
+</html>

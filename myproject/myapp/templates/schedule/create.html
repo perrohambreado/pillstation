@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Horario Pastillero</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Crear Horario Pastillero</h1>
+        
+        <form method="POST" action="{% url 'crear_horario' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="pastillero">Pastillero</label>
+                <select name="pastillero" id="pastillero" class="form-control">
+                    {% for pastillero in pastilleros %}
+                        <option value="{{ pastillero.id }}">{{ pastillero.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="medicamento">Medicamento</label>
+                <select name="medicamento" id="medicamento" class="form-control">
+                    {% for medicamento in medicamentos %}
+                        <option value="{{ medicamento.id }}">{{ medicamento.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dosis">Dosis</label>
+                <input type="number" name="dosis" id="dosis" class="form-control" value="{{ form.dosis.value }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hora_inicio">Hora de Inicio</label>
+                <input type="time" name="hora_inicio" id="hora_inicio" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hora_fin">Hora de Fin</label>
+                <input type="time" name="hora_fin" id="hora_fin" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dias">Días</label>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Lunes" id="lunes" class="form-check-input">
+                    <label for="lunes" class="form-check-label">Lunes</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Martes" id="martes" class="form-check-input">
+                    <label for="martes" class="form-check-label">Martes</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Miércoles" id="miercoles" class="form-check-input">
+                    <label for="miercoles" class="form-check-label">Miércoles</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Jueves" id="jueves" class="form-check-input">
+                    <label for="jueves" class="form-check-label">Jueves</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Viernes" id="viernes" class="form-check-input">
+                    <label for="viernes" class="form-check-label">Viernes</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Sábado" id="sabado" class="form-check-input">
+                    <label for="sabado" class="form-check-label">Sábado</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" name="dias" value="Domingo" id="domingo" class="form-check-input">
+                    <label for="domingo" class="form-check-label">Domingo</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Crear Horario</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

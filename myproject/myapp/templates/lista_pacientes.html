@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Pacientes</title>
+</head>
+<body>
+    <h1>Pacientes</h1>
+    <a href="{% url 'agregar_paciente' %}">Agregar Paciente</a>
+    <ul>
+        {% for paciente in pacientes %}
+            <li>
+                {{ paciente.nombre }} - {{ paciente.edad }} años - {{ paciente.telefono }}
+                <a href="{% url 'editar_paciente' paciente.id %}">Editar</a>
+                <a href="{% url 'eliminar_paciente' paciente.id %}">Eliminar</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

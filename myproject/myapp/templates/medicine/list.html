@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Medicamentos</title>
+</head>
+<body>
+    <h1>Lista de Medicamentos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Ingrediente Activo</th>
+                <th>Componentes</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for medicamento in medicamentos %}
+            <tr>
+                <td>{{ medicamento.nombre_medicamento }}</td>
+                <td>{{ medicamento.ingrediente_activo }}</td>
+                <td>{{ medicamento.componentes }}</td>
+                <td>{{ medicamento.estatus }}</td>
+                <td>
+                    <a href="{% url 'editar_medicamento' medicamento.pk %}">Editar</a> | 
+                    <a href="{% url 'eliminar_medicamento' medicamento.pk %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'crear_medicamento' %}">Crear nuevo medicamento</a>
+</body>
+</html>

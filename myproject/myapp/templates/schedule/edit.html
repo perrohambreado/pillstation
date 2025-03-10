@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Horario</title>
+</head>
+<body>
+    <h1>Editar Horario</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Renderiza los campos del formulario -->
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <a href="{% url 'listar_horarios' %}">Cancelar</a>
+</body>
+</html>

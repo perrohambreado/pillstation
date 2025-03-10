@@ -1,0 +1,9 @@
+{% block content %}
+  <h2>Editar Paciente</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Se renderiza el formulario con los datos actuales -->
+    <button type="submit">Guardar Cambios</button>
+  </form>
+  <a href="{% url 'listar_pacientes' %}">Volver a la lista</a>
+{% endblock %}

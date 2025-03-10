@@ -1,0 +1,22 @@
+{% if enfermero.pk %}
+    <a href="{% url 'eliminar_enfermero' enfermero.pk %}">Eliminar</a>
+{% else %}
+    <span>No se puede eliminar</span>
+{% endif %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Enfermero</title>
+</head>
+<body>
+    <h1>¿Estás seguro de que deseas eliminar al enfermero {{ enfermero.nombre }} {{ enfermero.apellidos }}?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Eliminar</button>
+        <a href="{% url 'enfermero_list' %}">Cancelar</a>
+    </form>
+</body>
+</html>

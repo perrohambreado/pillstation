@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Enfermeros</title>
+</head>
+<body>
+    <h1>Enfermeros</h1>
+    <a href="{% url 'crear_enfermero' %}">Crear Nuevo Enfermero</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>NFC ID</th>
+                <th>Turno</th>
+                <th>Email</th>
+                <th>ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enfermero in enfermeros %}
+            <tr>
+                <td>{{ enfermero.nombre }}</td>
+                <td>{{ enfermero.apellidos }}</td>
+                <td>{{ enfermero.nfc_id }}</td>
+                <td>{{ enfermero.turno }}</td>
+                <td>{{ enfermero.email }}</td>
+                <td>{{ enfermero.pk }}</td>
+
+                <td>
+                    <a href="{% url 'editar_enfermero' enfermero.id %}">Editar</a>
+                    <a href="{% url 'eliminar_enfermero' enfermero.id %}">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
