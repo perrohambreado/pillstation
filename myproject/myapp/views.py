@@ -9,6 +9,10 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 
+from rest_framework import viewsets
+from .serializer import PillStationSerializer
+from .models import PillStation
+
 """
 from .models import Paciente, Medicamento, Pastillero
 from .forms import PacienteForm, MedicamentoForm, HorarioForm, PastilleroForm
@@ -524,3 +528,6 @@ def esp32_endpoint(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
 
+class PillStationViewSet(viewsets.ModelViewSet):
+    queryset = PillStation.objects.all()
+    serializer_class = PillStationSerializer

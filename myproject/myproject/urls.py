@@ -41,5 +41,5 @@ urlpatterns = [
     path('schedule/', views.listar_horarios, name='listar_horarios'),
     path('horario/<pk>/editar/', views.editar_horario, name='editar_horario'),
     path('horario/<pk>/eliminar/', views.eliminar_horario, name='eliminar_horario'),
-    path('myapp/pastilleroAPI', include('myapp.urls'))
+    path('myapp/pastilleroAPI/', include('myapp.urls'))
 ]
