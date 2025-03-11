@@ -127,6 +127,14 @@ class UserForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+#DATOS DEL PASTILLERO
+class PillStation(models.Model):
+    ultrasonico = models.BooleanField(default=True)
+    temperatura = models.CharField(max_length=20)
+    humedad = models.CharField(max_length=20)
+    hora = models.PositiveSmallIntegerField()
+    minutos = models.PositiveSmallIntegerField()
+
 #class Paciente(models.Model):
 #    nombre = models.CharField(max_length=100)
 #    edad = models.IntegerField()
