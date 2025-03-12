@@ -50,12 +50,15 @@ def login(request):
     return render(request, 'login.html')
 
 def home(request):
+    return render(request, 'home.html')
+
+"""
+def home(request):
     if 'username' not in request.session:
         return redirect('home.html')
     username = request.session['username']
     return render(request, 'home.html', {'username': username})
-
-
+"""
 def userHome(request):
     return render(request, 'home.html')
 
