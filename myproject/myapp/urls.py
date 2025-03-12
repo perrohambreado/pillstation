@@ -1,10 +1,6 @@
-from django.urls import path, include
-from rest_framework import routers
-from myapp import views
-
-router = routers.DefaultRouter()
-router.register(r'pillstation', views.PillStationViewSet)
+from django.urls import path
+from . import views  # Importa las vistas de la aplicación
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('esp32/', views.esp32_endpoint, name='esp32_endpoint'),  
 ]
