@@ -25,8 +25,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('home/', views.home, name='home'),
     path('logout/', views.logout, name='logout'),
-    path('api/esp32/', views.esp32_endpoint, name = 'esp32_endpoint'),
-    path('api/', include('myapp.urls')),
     path('nurse/', views.listar_enfermeros, name='enfermero_list'), 
     path('crear/', views.crear_enfermero, name='crear_enfermero'),
     path('editar/<str:pk>/', views.editar_enfermero, name='editar_enfermero'),
@@ -43,4 +41,5 @@ urlpatterns = [
     path('schedule/', views.listar_horarios, name='listar_horarios'),
     path('horario/<pk>/editar/', views.editar_horario, name='editar_horario'),
     path('horario/<pk>/eliminar/', views.eliminar_horario, name='eliminar_horario'),
+    path('myapp/pastilleroAPI', include('myapp.urls'))
 ]
