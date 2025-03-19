@@ -6,36 +6,30 @@
     <title>Lista de Enfermeros</title>
 </head>
 <body>
-    <h1>Enfermeros</h1>
-    <a href="{% url 'crear_enfermero' %}">Crear Nuevo Enfermero</a>
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellidos</th>
-                <th>NFC ID</th>
-                <th>Turno</th>
-                <th>Email</th>
-                <th>ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for enfermero in enfermeros %}
-            <tr>
-                <td>{{ enfermero.nombre }}</td>
-                <td>{{ enfermero.apellidos }}</td>
-                <td>{{ enfermero.nfc_id }}</td>
-                <td>{{ enfermero.turno }}</td>
-                <td>{{ enfermero.email }}</td>
-                <td>{{ enfermero.pk }}</td>
-
-                <td>
-                    <a href="{% url 'editar_enfermero' enfermero.id %}">Editar</a>
-                    <a href="{% url 'eliminar_enfermero' enfermero.id %}">Eliminar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <h2>Lista de Enfermeros</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Turno</th>
+          <th>Teléfono</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for enfermero in enfermeros %}
+          <tr>
+            <td>{{ enfermero.nombre }} {{ enfermero.apellidos }}</td>
+            <td>{{ enfermero.turno }}</td>
+            <td>{{ enfermero.telefono_cel }}</td>
+            <td>
+              <a href="{% url 'editar_enfermero' enfermero.pk %}" class="btn btn-warning btn-sm">Editar</a>
+              <a href="{% url 'eliminar_enfermero' enfermero.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
+    <a href="{% url 'crear_enfermero' %}" class="btn btn-success">Crear Nuevo Enfermero</a>
 </body>
 </html>

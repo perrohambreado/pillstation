@@ -7,10 +7,60 @@
 </head>
 <body>
     <h1>Crear Enfermero</h1>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Guardar</button>
+        
+        <div class="form-group">
+            <h3>Usuario</h3>
+            {{ user_form.as_p }}
+        </div>
+        
+        <div class="form-group">
+            <h3>Datos del Enfermero</h3>
+            <!-- Destacar los campos nombre y apellidos -->
+            <div class="important-fields">
+                <p>
+                    <label for="id_nombre">Nombre:</label>
+                    {{ enfermero_form.nombre }}
+                    {% if enfermero_form.nombre.errors %}
+                    <span class="error">{{ enfermero_form.nombre.errors }}</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <label for="id_apellidos">Apellidos:</label>
+                    {{ enfermero_form.apellidos }}
+                    {% if enfermero_form.apellidos.errors %}
+                    <span class="error">{{ enfermero_form.apellidos.errors }}</span>
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- Resto de los campos -->
+            {% for field in enfermero_form %}
+                {% if field.name != 'nombre' and field.name != 'apellidos' %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}
+                    <span class="error">{{ field.errors }}</span>
+                    {% endif %}
+                </p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Crear Enfermero</button>
     </form>
 </body>
 </html>

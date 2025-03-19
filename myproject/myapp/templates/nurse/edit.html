@@ -6,11 +6,18 @@
     <title>Crear Enfermero</title>
 </head>
 <body>
-    <h1>{% block title %}Crear Nuevo Enfermero{% endblock %}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Guardar</button>
+    <h2>Editar Enfermero: {{ enfermero.nombre }} {{ enfermero.apellidos }}</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <h3>Usuario</h3>
+        {{ user_form.as_p }}
+      </div>
+      <div class="form-group">
+        <h3>Enfermero</h3>
+        {{ enfermero_form.as_p }}
+      </div>
+      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </form>
 </body>
 </html>

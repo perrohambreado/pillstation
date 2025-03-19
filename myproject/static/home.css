@@ -192,6 +192,7 @@ button:hover {
   justify-content: center;
   display: flex;
   position: relative;
+  background-color: rgb(23, 38, 45,)
 }
 
 .leftoo{
@@ -263,3 +264,123 @@ button:hover {
   border-right: none;
 }
 
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+}
+
+.footer-section {
+  margin: 10px;
+  min-width: 200px;
+}
+
+.footer-section h3 {
+  margin-bottom: 10px;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin: 5px 0;
+}
+
+.footer-section ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos de redes sociales */
+.social-icons a {
+  color: white;
+  font-size: 20px;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+.social-icons a:hover {
+  color: #1DA1F2;
+}
+
+/* Texto inferior del footer */
+.footer-bottom {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* Diseño responsivo */
+@media (max-width: 600px) {
+  .footer-container {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  h1{
+    font-size: 2rem;
+    color: rgb(0, 0, 0);
+    font-family: "League Spartan", sans-serif;
+    font-weight: normal;
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: 900px){
+  h1{
+    font-size: 3rem;
+    color: rgb(0, 0, 0);
+    font-family: "League Spartan", sans-serif;
+    font-weight: normal;
+    line-height: 1.2;
+  }
+
+  .infoo h2{
+    font-size: 1rem;
+    color: rgb(0, 0, 0);
+    font-family: "League Spartan", sans-serif;
+    font-weight: lighter;
+    line-height: 1.2;
+  }
+
+  .leftoo{
+    width: 50%;
+    display: flex;
+    height: 100%;
+    padding-bottom: 4.5vw;
+    padding-left: 5vw;
+    padding-right: 2vw;
+    padding-top: 4.5vw;
+    align-items: flex-end;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .rightoo{
+    width: 50%;
+    display: flex;
+    height: 100%;
+    padding-bottom: 4.5vw;
+    padding-left: 2vw;
+    padding-right: 5vw;
+    padding-top: 4.5vw;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+  }
+}

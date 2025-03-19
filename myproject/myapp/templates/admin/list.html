@@ -1,0 +1,41 @@
+<!-- templates/admin/list.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Administradores</title>
+</head>
+<body>
+    <h1>Listado de Administradores</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Departamento</th>
+                <th>Nivel de Acceso</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for administrador in administradores %}
+                <tr>
+                    <td>{{ administrador.usuario.username }}</td>
+                    <td>{{ administrador.departamento }}</td>
+                    <td>{{ administrador.nivel_acceso }}</td>
+                    <td>
+                        <a href="{% url 'editar_administrador' administrador.pk %}">Editar</a> |
+                        <a href="{% url 'eliminar_administrador' administrador.pk %}">Eliminar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No hay administradores registrados</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{% url 'crear_administrador' %}">Crear nuevo administrador</a>
+</body>
+</html>

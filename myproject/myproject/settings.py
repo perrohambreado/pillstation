@@ -28,6 +28,8 @@ SECRET_KEY = 'django-insecure-4*e%1vsohq%79#f=&^btoq7*1!@ubmg$d)hg08zv83+v6=9r5t
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+LOGIN_REDIRECT_URL = '/home/'
+
 
 
 # Application definition
@@ -73,6 +75,9 @@ TEMPLATES = [
     },
 ]
 
+DATABASE_ROUTERS = ['myapp.routers.AuthRouter']
+
+
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
@@ -80,7 +85,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'mongodb': {
         'ENGINE': 'djongo',
         'CLIENT':{
             'name': 'PillStation',
@@ -92,6 +97,11 @@ DATABASES = {
             'tls': True,
             'tlsAllowInvalidCertificates': True,
         }
+    },
+
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -117,8 +127,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'myapp.User'
 
-# Internationalization
+# Internationalizationy
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'

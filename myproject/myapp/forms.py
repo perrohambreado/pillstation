@@ -1,64 +1,46 @@
 from django import forms
-from .models import Paciente, Medicamento, Enfermero, Pastillero
+from .models import Paciente, Medicamento, Enfermero, Pastillero, User, Administrador
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 from mongoengine import queryset
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
 
-"""
-class PacienteForm(forms.ModelForm):
+User = get_user_model()  # Obtiene tu modelo de usuario personalizado
+
+class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        model = Paciente
-        fields = ['nombre', 'edad', 'telefono'] 
+        model = User
+        fields = ['username', 'email', 'password1', 'password2', 'telefono', 'tipo_usuario']
 
-class MedicamentoForm(forms.ModelForm):
+# A D M I N I S T R A D O R
+
+class AdministradorForm(forms.ModelForm):
     class Meta:
-        model = Medicamento
-        fields = ['nombre', 'dosis', 'paciente'] 
+        model = Administrador
+        fields = ['departamento', 'nivel_acceso']
 
-class HorarioForm(forms.ModelForm):
-    class Meta:
-        model = Horario
-        fields = ['medicamento', 'hora']  
+# E N F E R M E R O
 
-class MedicamentoForm(forms.ModelForm):
-    class Meta:
-        model = Medicamento
-        fields = ['nombre', 'dosis', 'paciente']
-
-class HorarioForm(forms.ModelForm):
-    class Meta:
-        model = Horario
-        fields = ['medicamento', 'hora']
-
-class PastilleroForm(forms.ModelForm):
-    class Meta:
-        model = Pastillero
-        fields = ['estado', 'paciente']
-
-"""
-
-class EnfermeroForm(forms.Form):
-    nombre = forms.CharField(max_length=100)
-    apellidos = forms.CharField(max_length=150)
-    nfc_id = forms.CharField(max_length=50)
-    turno = forms.ChoiceField(choices=[("Matutino", "Matutino"), 
-                                      ("Vespertino", "Vespertino"), 
-                                      ("Nocturno", "Nocturno")])
-    activo = forms.BooleanField(required=False)
-    usuario = forms.CharField(max_length=50)
-    password = forms.CharField(widget=forms.PasswordInput)
-    email = forms.EmailField()
-    TelefonoCel = forms.CharField(max_length=15)
+class EnfermeroForm(forms.ModelForm):
+    pastilleros = forms.MultipleChoiceField(required=False)
     
-    def __init__(self, *args, **kwargs):
-        instance = kwargs.pop('instance', None)
-        super().__init__(*args, **kwargs)  
+    class Meta:
+        model = Enfermero
+        fields = [
+            'nombre', 
+            'apellidos', 
+            'nfc_id', 
+            'turno', 
+            'activo', 
+            'estatus',
+        ]
         
-        if instance:
-            for field in self.fields:
-                if hasattr(instance, field):
-                    self.fields[field].initial = getattr(instance, field, None)
-
+    def __init__(self, *args, **kwargs):
+        super(EnfermeroForm, self).__init__(*args, **kwargs)
+        # Hacer los campos nombre y apellidos obligatorios
+        self.fields['nombre'].required = True
+        self.fields['apellidos'].required = True
 
 class PacienteForm(forms.Form):
     fecha_ingreso = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))

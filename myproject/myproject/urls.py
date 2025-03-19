@@ -1,30 +1,18 @@
-"""
-URL configuration for myproject project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from myapp import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('register/', views.register, name='register'),
-    path('login/', views.login, name='login'),
     path('home/', views.home, name='home'),
-    path('logout/', views.logout, name='logout'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('admin/select_dashboard/', views.admin_select_dashboard, name='admin_select_dashboard'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('nurse_dashboard/', views.nurse_dashboard, name='nurse_dashboard'),
     path('nurse/', views.listar_enfermeros, name='enfermero_list'), 
     path('crear/', views.crear_enfermero, name='crear_enfermero'),
     path('editar/<str:pk>/', views.editar_enfermero, name='editar_enfermero'),
@@ -41,5 +29,12 @@ urlpatterns = [
     path('schedule/', views.listar_horarios, name='listar_horarios'),
     path('horario/<pk>/editar/', views.editar_horario, name='editar_horario'),
     path('horario/<pk>/eliminar/', views.eliminar_horario, name='eliminar_horario'),
-    path('myapp/pastilleroAPI', include('myapp.urls'))
+    path('administradores/', views.listar_administradores, name='listar_administradores'),
+    path('administrador/crear/', views.crear_administrador, name='crear_administrador'),
+    path('administrador/editar/<int:pk>/', views.editar_administrador, name='editar_administrador'),
+    path('administrador/eliminar/<int:pk>/', views.eliminar_administrador, name='eliminar_administrador'),
+    path('nurse/crear/', views.crear_enfermero, name='crear_enfermero'),
+    path('nurse/editar/<int:pk>/', views.editar_enfermero, name='editar_enfermero'),
+    path('nurse/', views.listar_enfermeros, name='listar_enfermeros'),
+    path('nurse/eliminar/<int:pk>/', views.eliminar_enfermero, name='eliminar_enfermero'),
 ]

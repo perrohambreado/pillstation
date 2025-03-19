@@ -1,22 +1,297 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
-from .models import UserForm, Enfermero, Paciente, Medicamento, Pastillero, HorarioPastillero
-from .forms import EnfermeroForm, PacienteForm, MedicamentoForm, HorarioPastilleroForm
+from .models import UserForm, Enfermero, Paciente, Medicamento, Pastillero, HorarioPastillero, Administrador
+from .forms import AdministradorForm, EnfermeroForm, PacienteForm, MedicamentoForm, HorarioPastilleroForm, CustomUserCreationForm
 from pymongo import MongoClient
-from bson import ObjectId
-from mongoengine.errors import DoesNotExist, ValidationError
-from django.http import Http404
+from mongoengine.errors import DoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import datetime
-
-"""
-from .models import Paciente, Medicamento, Pastillero
-from .forms import PacienteForm, MedicamentoForm, HorarioForm, PastilleroForm
-"""
-
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.http import HttpResponseForbidden, HttpResponse
+from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from .signals import sync_nurse_to_mongo, sync_admin_to_mongo, eliminar_admin_de_mongo, eliminar_enfermero_de_mongo   
+from django.http import JsonResponse
 
 client = MongoClient("mongodb+srv://regina:pKW6Ir1kXLapHf5u@pillstation.c4ue9.mongodb.net/?retryWrites=true&w=majority&appName=PillStation")
 db = client["PillStation"]
+
+# S E S I O N
+
+# Vista para login
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            
+            if user.tipo_usuario == 'admin':
+                return redirect('admin_select_dashboard') 
+            elif user.tipo_usuario == 'enfermero':
+                return redirect('nurse_dashboard')  
+            else:
+                return redirect('home')
+        else:
+            return HttpResponse('Credenciales no válidas', status=401)
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'login.html', {'form': form})
+
+# Vista para logout
+def logout_view(request):
+    logout(request)
+    return redirect('login') 
+
+# Vista para que el administrador elija qué listar
+@login_required
+def admin_select_dashboard(request):
+    if request.user.tipo_usuario != 'admin':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    return render(request, 'admin_select_dashboard.html')
+
+# D A S H B O A R D  A D M I N
+
+# Vista del dashboard para el Administrador
+@login_required
+def admin_dashboard(request):
+    if not request.user.admin:
+        return HttpResponseForbidden("Acceso denegado")
+    
+    return render(request, 'admin_dashboard.html')
+
+# Crear administrador
+User = get_user_model()
+
+def crear_administrador(request):
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST)
+        admin_form = AdministradorForm(request.POST)
+        
+        if user_form.is_valid() and admin_form.is_valid():
+            username = user_form.cleaned_data['username']
+            
+            if User.objects.filter(username=username).exists():
+                usuario_existente = User.objects.get(username=username)
+                if hasattr(usuario_existente, 'administrador'):
+                    admin_form.add_error('usuario', 'Este usuario ya tiene un administrador asignado.')
+                    messages.error(request, 'Error: Este usuario ya tiene un administrador.')
+                    return render(request, 'admin/create.html', {'user_form': user_form, 'admin_form': admin_form})
+                
+                usuario_existente.is_staff = True
+                usuario_existente.is_superuser = True
+                usuario_existente.tipo_usuario = 'admin'
+                usuario_existente._skip_signal = True
+                usuario_existente.save()
+                
+                nuevo_administrador = admin_form.save(commit=False)
+                nuevo_administrador.usuario = usuario_existente
+                nuevo_administrador.save()
+                messages.success(request, 'Administrador creado exitosamente.')
+                
+                return redirect('listar_administradores')
+            
+            nuevo_usuario = user_form.save(commit=False)
+            nuevo_usuario.tipo_usuario = 'admin'
+            nuevo_usuario.is_staff = True
+            nuevo_usuario.is_superuser = True
+            nuevo_usuario.save()
+            
+            nuevo_usuario._skip_signal = True
+            nuevo_usuario.save()
+            
+            nuevo_administrador = admin_form.save(commit=False)
+            nuevo_administrador.usuario = nuevo_usuario
+            nuevo_administrador.save()
+            
+            sync_admin_to_mongo(nuevo_administrador)
+            
+            messages.success(request, 'Administrador creado exitosamente.')
+            return redirect('listar_administradores')
+        else:
+            print("Errores en user_form:", user_form.errors)
+            print("Errores en admin_form:", admin_form.errors)
+            messages.error(request, 'Error al crear el administrador.')
+    else:
+        user_form = CustomUserCreationForm()
+        admin_form = AdministradorForm()
+    
+    return render(request, 'admin/create.html', {'user_form': user_form, 'admin_form': admin_form})
+
+# Editar administrador 
+def editar_administrador(request, pk):
+    try:
+        administrador = Administrador.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return redirect('listar_administradores')
+
+    user = administrador.usuario
+
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST, instance=user)
+        admin_form = AdministradorForm(request.POST, instance=administrador)
+        
+        if user_form.is_valid() and admin_form.is_valid():
+            user = user_form.save()
+
+            administrador = admin_form.save(commit=False)
+            administrador.usuario = user
+            administrador.save()
+
+            return redirect('listar_administradores')
+    else:
+        user_form = CustomUserCreationForm(instance=user)
+        admin_form = AdministradorForm(instance=administrador)
+
+    return render(request, 'admin/edit.html', {'user_form': user_form, 'admin_form': admin_form, 'administrador': administrador})
+
+# Listar administradores
+def listar_administradores(request):
+    administradores = Administrador.objects.all()
+    return render(request, 'admin/list.html', {'administradores': administradores})
+
+# Eliminar administrador
+
+def eliminar_administrador(request, pk):
+    try:
+        administrador = Administrador.objects.get(id=pk)
+    except Administrador.DoesNotExist:
+        return redirect('listar_administradores')
+
+    usuario = administrador.usuario
+
+    if request.method == 'POST':
+
+        eliminar_admin_de_mongo(usuario.id) 
+        administrador.delete()
+
+        usuario.delete()
+
+        return redirect('listar_administradores')
+
+    return render(request, 'admin/delete.html', {'administrador': administrador})
+
+# D A S H B O A R D  N U R S E
+
+# Vista del dashboard para el Administrador
+@login_required
+def nurse_dashboard(request):
+    if not request.user.admin:
+        return HttpResponseForbidden("Acceso denegado")
+    
+    return render(request, 'nurse_dashboard.html')
+
+# Crear enfermero
+User = get_user_model()
+
+def crear_enfermero(request):
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST)
+        enfermero_form = EnfermeroForm(request.POST)
+
+        if user_form.is_valid() and enfermero_form.is_valid():
+            username = user_form.cleaned_data['username']
+
+            if User.objects.filter(username=username).exists():
+                usuario_existente = User.objects.get(username=username)
+                if hasattr(usuario_existente, 'enfermero'):
+                    enfermero_form.add_error('usuario', 'Este usuario ya tiene un enfermero asignado.')
+                    messages.error(request, 'Error: Este usuario ya tiene un enfermero.')
+                    return render(request, 'nurse/create.html', {'user_form': user_form, 'enfermero_form': enfermero_form})
+
+                usuario_existente.is_staff = True
+                usuario_existente.save()
+
+                nuevo_enfermero = enfermero_form.save(commit=False)
+                nuevo_enfermero.usuario = usuario_existente
+                nuevo_enfermero.save()
+                messages.success(request, 'Enfermero creado Existosamente') 
+                return redirect('listar_enfermeros')     
+            
+            nuevo_usuario = user_form.save(commit=False)
+            nuevo_usuario.tipo_usuario = 'enfermero' 
+            nuevo_usuario.is_staff = True
+            nuevo_usuario.is_superuser = False 
+            nuevo_usuario.save()
+
+            nuevo_usuario._skip_signal = True
+            nuevo_usuario.save()
+
+            nuevo_enfermero = enfermero_form.save(commit=False)   
+            nuevo_enfermero.usuario = nuevo_usuario
+            nuevo_enfermero.save()  
+
+
+            sync_nurse_to_mongo(nuevo_enfermero)
+
+            messages.success(request, 'Enfermero creado exitosamente.')
+            return redirect('listar_enfermeros')
+        else:
+            print("Errores en user_form:", user_form.errors)
+            print("Errores en enfermero_form:", enfermero_form.errors)
+            messages.error(request, 'Error al crear el administrador.')
+    else:
+        user_form = CustomUserCreationForm()
+        enfermero_form = EnfermeroForm()
+    
+    return render(request, 'nurse/create.html', {'user_form': user_form, 'enfermero_form': enfermero_form})
+
+# Editar enfermero
+def editar_enfermero(request, pk):
+    try:
+        enfermero = Enfermero.objects.get(pk=pk)
+    except Enfermero.DoesNotExist:
+        return redirect('listar_enfermeros')
+
+    user = enfermero.usuario
+
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST, instance=user)
+        enfermero_form = EnfermeroForm(request.POST, instance=enfermero)
+        
+        if user_form.is_valid() and enfermero_form.is_valid():
+            user = user_form.save()
+
+            enfermero = enfermero_form.save(commit=False)
+            enfermero.usuario = user
+            enfermero.save()
+
+            return redirect('listar_enfermeros')
+    else:
+        user_form = CustomUserCreationForm(instance=user)
+        enfermero_form = EnfermeroForm(instance=enfermero)
+
+    return render(request, 'nurse/edit.html', {'user_form': user_form, 'enfermero_form': enfermero_form, 'enfermero': enfermero})
+
+# Listar enfermeros
+def listar_enfermeros(request):
+    enfermeros = Enfermero.objects.all()
+    return render(request, 'nurse/list.html', {'enfermeros': enfermeros})
+
+# Eliminar enfermero
+from django.shortcuts import render, redirect
+from .models import Enfermero
+
+def eliminar_enfermero(request, pk):
+    try:
+        enfermero = Enfermero.objects.get(id=pk)
+    except Enfermero.DoesNotExist:
+        return redirect('listar_enfermeros')
+
+    usuario = enfermero.usuario
+
+    if request.method == 'POST':
+
+        eliminar_enfermero_de_mongo(usuario.id)
+        enfermero.delete()
+
+        usuario.delete()
+
+        return redirect('listar_enfermeros')
+
+    return render(request, 'nurse/delete.html', {'enfermero': enfermero})
 
 def index(request):
     return render(request, 'index.html')
@@ -36,7 +311,7 @@ def register(request):
         form = UserForm()
     return render(request, 'register.html', {'form': form})
 
-def login(request):
+def loginn(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -52,13 +327,6 @@ def login(request):
 def home(request):
     return render(request, 'home.html')
 
-"""
-def home(request):
-    if 'username' not in request.session:
-        return redirect('home.html')
-    username = request.session['username']
-    return render(request, 'home.html', {'username': username})
-"""
 def userHome(request):
     return render(request, 'home.html')
 
@@ -217,79 +485,6 @@ def generar_reporte(request):
     return render(request, 'generar_reporte.html')
 
 """
-
-# E N F E R M E R O S
-
-# Crear un nuevo enfermero
-def crear_enfermero(request):
-    if request.method == 'POST':
-        form = EnfermeroForm(request.POST)
-        if form.is_valid():
-            nuevo_enfermero = Enfermero(
-                nombre=form.cleaned_data['nombre'],
-                apellidos=form.cleaned_data['apellidos'],
-                nfc_id=form.cleaned_data['nfc_id'],
-                turno=form.cleaned_data['turno'],
-                activo=form.cleaned_data['activo'],
-                usuario=form.cleaned_data['usuario'],
-                password=form.cleaned_data['password'],
-                email=form.cleaned_data['email'],
-                TelefonoCel=form.cleaned_data['TelefonoCel']
-            )
-            nuevo_enfermero.save()
-            return redirect('enfermero_list')  
-    else:
-        form = EnfermeroForm() 
-
-    return render(request, 'nurse/create.html', {'form': form})
-
-# Editar un enfermero existente
-def editar_enfermero(request, pk):
-    try:
-        enfermero = Enfermero.objects.get(pk=pk)
-    except DoesNotExist:
-        return redirect('enfermero_list')
-
-    if request.method == 'POST':
-        form = EnfermeroForm(request.POST, instance=enfermero)
-        if form.is_valid():
-            enfermero.nombre = form.cleaned_data['nombre']
-            enfermero.apellidos = form.cleaned_data['apellidos']
-            enfermero.nfc_id = form.cleaned_data['nfc_id']
-            enfermero.turno = form.cleaned_data['turno']
-            enfermero.activo = form.cleaned_data['activo']
-            enfermero.usuario = form.cleaned_data['usuario']
-            enfermero.password = form.cleaned_data['password']
-            enfermero.email = form.cleaned_data['email']
-            enfermero.TelefonoCel = form.cleaned_data['TelefonoCel']
-            enfermero.save()
-
-            return redirect('enfermero_list') 
-    else:
-        form = EnfermeroForm(instance=enfermero)  
-
-    return render(request, 'nurse/edit.html', {'form': form, 'enfermero': enfermero})
-
-# Listar todos los enfermeros
-def listar_enfermeros(request):
-    enfermeros = Enfermero.objects.all()
-    for enfermero in enfermeros:
-        print(enfermero.pk)
-    return render(request, 'nurse/list.html', {'enfermeros': enfermeros})
-
-# Eliminar un enfermero
-def eliminar_enfermero(request, pk):
-    try:
-        enfermero = Enfermero.objects.get(id=pk)
-    except Enfermero.DoesNotExist:
-        return redirect('enfermero_list')
-
-    if request.method == 'POST':
-        enfermero.delete()
-        return redirect('enfermero_list')
-
-    return render(request, 'nurse/delete.html', {'enfermero': enfermero})
-
 # P A C I E N T E S 
 
 # Crear un nuevo paciente
@@ -494,36 +689,6 @@ def eliminar_horario(request, pk):
     
     return render(request, 'schedule/delete.html', {'horario': horario})
 
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Pastillero, Medicamento, HorarioPastillero
-
-@csrf_exempt  
-def esp32_endpoint(request):
+def add(request):
     if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            pastillero_id = data.get('pastillero_id')
-            medicamento = data.get('medicamento')
-            estado = data.get('estado')
-            hora = data.get('hora')
-
-            pastillero = Pastillero.objects.get(id=pastillero_id)
-            medicamento_obj = Medicamento.objects.get(nombre_medicamento=medicamento)
-
-            horario = HorarioPastillero.objects.create(
-                pastillero=pastillero,
-                medicamento=medicamento_obj,
-                estado=estado,
-                hora=hora
-            )
-
-            return JsonResponse({'status': 'success', 'message': 'Datos recibidos correctamente'})
-
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
-
+        user = request.POST['user']

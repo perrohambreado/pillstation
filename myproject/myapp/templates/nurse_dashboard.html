@@ -1,0 +1,14 @@
+<!-- nurse_dashboard.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurse Dashboard</title>
+</head>
+<body>
+    <h2>Bienvenido, {{ user.username }} (Enfermero)</h2>
+    <p>Este es el panel de enfermero.</p>
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>
