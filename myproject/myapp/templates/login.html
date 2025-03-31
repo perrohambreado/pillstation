@@ -1,17 +1,36 @@
-<!-- login_view.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'login.css' %}">  
     <meta charset="UTF-8">
+    <script src="https://kit.fontawesome.com/c51f852900.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Iniciar Sesión</title>
 </head>
 <body>
-    <h2>Login</h2>
-    <form action="{% url 'login' %}" method="POST">
+    <header>
+        <div class="left">
+            <a href="{% url 'home' %}"><h2>PillStation</h2></a>
+        </div>
+      </header>
+    <div class="loginFormm">
+      <form class="loginForm" action="{% url 'login' %}" method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
+        <h2>Bienvenido de vuelta</h2>
+    
+        <div class="input-container">
+            <i class="fas fa-user"></i>
+            <input type="text" name="username" placeholder="Usuario" required>
+        </div>
+    
+        <div class="input-container2">
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <i class="fas fa-lock"></i>
+        </div>
+        <button type="submit">Iniciar Sesión</button>
     </form>
+    </div>
 </body>
 </html>

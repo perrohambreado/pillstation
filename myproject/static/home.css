@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "League Spartan", sans-serif;
   margin: 0rem;
 }
 
@@ -34,6 +34,8 @@ header{
   align-items: center;
   justify-content: flex-end;
 }
+
+
 
 h1{
   font-size: 4rem;

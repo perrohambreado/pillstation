@@ -1,0 +1,180 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "League Spartan", sans-serif;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(to right, rgb(255, 255, 255) 50%, rgb(23, 38, 45) 50%);
+}
+
+h2, h1 {
+  color: rgb(0, 0, 0);
+  font-weight: lighter;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 15vh;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(193, 193, 193, 0.421);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.card-header {
+  background-color: rgb(255, 255, 255);
+  color: rgb(23, 38, 45);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.card-header h5 {
+  display: block;
+  font-weight: 300;
+  font-size: 1.5rem;
+  padding: 20px;
+  padding-bottom: 0px;
+  text-align: center;
+}
+
+.card-body {
+  padding: 15px;
+  background: rgb(255, 255, 255);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+  justify-content: center;
+}
+
+.table th {
+  color: rgb(0, 0, 0);
+  font-weight: 200;
+  background-color: rgba(255, 255, 255, 0.523);
+  text-align: center;
+}
+
+.table td {
+  vertical-align: middle;
+  text-align: center;
+  row-gap: 1ch;
+  font-family: 200;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.alert-info i {
+  margin-right: 10px;
+}
+
+.detail-btn {
+  background-color: rgb(23, 38, 45);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s;
+  font-weight: lighter;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.detail-btn:hover {
+  transform: scale(1.05);
+}
+
+.btn-danger {
+  background-color: #67050f;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.2s;
+  font-weight: lighter;
+  padding: 10px;
+}
+
+.btn-danger:hover {
+  transform: scale(1.05);
+}
+
+tr{
+  display: table-row;
+  vertical-align: middle;
+  unicode-bidi: isolate; 
+  border-color: inherit;
+  text-align: center;
+  font-weight: lighter;
+}
+
+ul, li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  row-gap: 1ch;
+  margin-bottom: 4px;
+}
+
+li:last-child {
+  margin-bottom: 0;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: lighter;
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}

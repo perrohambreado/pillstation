@@ -1,0 +1,130 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "League Spartan", sans-serif;
+}
+
+body {
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(to right, rgb(255, 255, 255) 50%, rgb(23, 38, 45) 50%);
+}
+
+.container {
+  width: 65vw;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(193, 193, 193, 0.421);
+  font-weight: lighter;
+  margin: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgb(23, 38, 45);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+h1 {
+  margin: 0;
+  font-weight: 100;
+  font-size: 2.2em;
+}
+
+h2 {
+  margin: 0;
+  font-weight: 100;
+  font-size: 1.7em;
+  text-align: center;
+}
+
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.info-table th, .info-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.info-table th {
+  background: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+
+.estado-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.estado-card {
+  background: rgb(23, 38, 45);
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+  width: 30%;
+  line-height: 1.6;
+  color: white;
+}
+
+.medicamentos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.medicamentos-table th, .medicamentos-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.medicamentos-table thead {
+  background: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+
+.enfermeros-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+  justify-content: center;
+}
+
+.enfermero-card {
+  background: rgb(23, 38, 45);
+  padding: 10px;
+  border-radius: 5px;
+  width: 30%;
+  text-align: center;
+  color: white;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-weight: lighter;
+  color: white;
+  background-color: transparent;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.2);
+}

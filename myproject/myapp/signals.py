@@ -5,7 +5,7 @@ from django.utils import timezone
 from .models import (
     User, Administrador, Enfermero, 
     EnfermeroMongo, MongoAdministrador, 
-    EnfermeroPastillero
+    EnfermeroPastillero, Pastillero, Medicamento
 )
 
 @receiver(post_save, sender=User)
@@ -47,6 +47,7 @@ def handle_pastillero_relation(sender, instance, created, **kwargs):
             enfermero=instance.enfermero
         ).values_list('pastillero_id', flat=True))
 
+        # Usar mongoengine correctamente
         enfermero_mongo = EnfermeroMongo.objects(usuario_id=instance.enfermero.usuario.id).first()
         if enfermero_mongo:
             enfermero_mongo.pastilleros_autorizados = pastilleros
@@ -59,6 +60,51 @@ def handle_pastillero_relation(sender, instance, created, **kwargs):
         # Para desarrollo, es útil ver el error completo
         import traceback
         traceback.print_exc()
+
+def sync_pastillero_relation(enfermero_id, pastillero_id, add=True):
+    from django.db import transaction
+    
+    try:
+        with transaction.atomic():
+            enfermero = Enfermero.objects.get(id=enfermero_id)
+            
+            if add:
+                EnfermeroPastillero.objects.get_or_create(
+                    enfermero=enfermero, 
+                    pastillero_id=pastillero_id
+                )
+            else:
+                EnfermeroPastillero.objects.filter(
+                    enfermero=enfermero,
+                    pastillero_id=pastillero_id
+                ).delete()
+                
+            enfermero_mongo = EnfermeroMongo.objects(usuario_id=enfermero.usuario.id).first()
+            if not enfermero_mongo:
+                raise ValueError(f"No se encontró el enfermero en MongoDB: {enfermero.usuario.id}")
+                
+            pastillero = Pastillero.objects(id=pastillero_id).first()
+            if not pastillero:
+                raise ValueError(f"No se encontró el pastillero en MongoDB: {pastillero_id}")
+            
+            if add:
+                enfermeros_ids = [str(ref.id) for ref in pastillero.enfermeros_autorizados]
+                if str(enfermero_mongo.id) not in enfermeros_ids:
+                    pastillero.enfermeros_autorizados.append(enfermero_mongo)
+                    pastillero.save()
+            else:
+                pastillero.enfermeros_autorizados = [
+                    ref for ref in pastillero.enfermeros_autorizados 
+                    if str(ref.id) != str(enfermero_mongo.id)
+                ]
+                pastillero.save()
+                
+            return True
+    except Exception as e:
+        print(f"Error al sincronizar relación pastillero-enfermero: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def sync_admin_to_mongo(admin_instance):
     usuario = admin_instance.usuario
@@ -135,7 +181,6 @@ def sync_nurse_to_mongo(nurse_instance):
         'usuario_id': usuario.id,
         'username': usuario.username,
         'email': usuario.email,
-        'password': usuario.password, 
         'nombre': nurse_instance.nombre,
         'apellidos': nurse_instance.apellidos,
         'nfc_id': nurse_instance.nfc_id,

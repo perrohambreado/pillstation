@@ -1,11 +1,10 @@
 from django.db import models
 from django import forms
-from django.contrib.auth.hashers import make_password
-from django.utils import timezone
 from mongoengine import Document, EmailField, BooleanField, DateTimeField, fields, NULLIFY, CASCADE, StringField, ReferenceField, IntField, ListField
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime    
-from mongoengine import Document, EmailField, fields, StringField, ReferenceField, IntField, ListField, EmailField, BooleanField
+from django.conf import settings
+
 # U S U A R I O S
 class User(AbstractUser):
     telefono = models.CharField(max_length=15, blank=True, null=True)
@@ -13,16 +12,12 @@ class User(AbstractUser):
         ('admin', 'Administrador'),
         ('enfermero', 'Enfermero')
     ])
-    
     class Meta:
         db_table = 'usuarios'
-        
     def __str__(self):
         return f"{self.username} ({self.get_tipo_usuario_display()})"
 
-
 # A M I N I S T R A D O R
-from django.conf import settings
 # Administrador - Modelo SQLite
 class Administrador(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin')
@@ -50,6 +45,7 @@ class MongoAdministrador(Document):
 # E N F E R M E R O S
 # Enfermero - Modelo SQLite
 class Enfermero(models.Model):
+    meta = {'strict': False} 
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enfermero')
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=150)
@@ -63,20 +59,26 @@ class Enfermero(models.Model):
     fecha_registro = models.DateTimeField(auto_now_add=True)
     estatus = models.BooleanField(default=True)
     telefono_cel = models.CharField(max_length=15)
+
     def get_pastilleros(self):
-        from myapp.models import Pastillero  # Importa el modelo de MongoDB
-        pastillero_ids = self.pastilleros.values_list('pastillero_id', flat=True)
-        return Pastillero.objects(id__in=pastillero_ids)
+        from myapp.models import Pastillero, EnfermeroMongo
+        enfermero_mongo = EnfermeroMongo.objects(usuario_id=self.usuario.id).first()
+        if not enfermero_mongo:
+            return []
+        pastilleros = Pastillero.objects(enfermeros_autorizados=enfermero_mongo)
+        return pastilleros
+
     class Meta:
         db_table = 'enfermeros'
+
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
-    
+
+# Enfermero - Modelo espejo MongoDB   
 class EnfermeroMongo(Document):
-    usuario_id = IntField(required=True, unique=True)
+    usuario_id = IntField(required=True, unique=True)  # Relación con el usuario en SQLite
     username = StringField(max_length=50)
     email = EmailField()
-    password = StringField(max_length=255)
     nombre = StringField(max_length=100)
     apellidos = StringField(max_length=150)
     nfc_id = StringField(max_length=50, unique=True)
@@ -85,14 +87,11 @@ class EnfermeroMongo(Document):
     fecha_registro = DateTimeField()
     estatus = BooleanField(default=True)
     telefono_cel = StringField(max_length=15)
-    pastilleros_autorizados = ListField(IntField(), default=[])
-    
-    meta = {'collection': 'Enfermero'}
-    
-    def __str__(self):
-        return f"{self.nombre} {self.apellidos}"
+    pastilleros_autorizados = ListField(StringField(), default=[])  # Almacena códigos de pastilleros
 
-# Relación Enfermero-Pastillero (SQLite)
+    meta = {'collection': 'Enfermero', 'strict': False} 
+
+
 class EnfermeroPastillero(models.Model):
     enfermero = models.ForeignKey(Enfermero, on_delete=models.CASCADE, related_name='pastilleros')
     pastillero_id = models.CharField(max_length=24)  # ID del pastillero en MongoDB
@@ -100,68 +99,95 @@ class EnfermeroPastillero(models.Model):
     class Meta:
         db_table = 'enfermero_pastillero'
         unique_together = ('enfermero', 'pastillero_id')
+    
+    def __str__(self):
+        return f"{self.enfermero} - Pastillero {self.pastillero_id}"
+    
+from mongoengine import Document, fields, ReferenceField, StringField, ListField, DictField, BooleanField
 
-
-# P A S T I L L E R O S
-class Ubicacion(Document):
-    edificio = fields.StringField(max_length=100)
-    piso = fields.IntField()
-    area = fields.StringField(max_length=100)
-    cama = fields.StringField(max_length=50)
-
+    
+class Medicamento(Document):
+    nombre_medicamento = StringField(max_length=100)
+    ingrediente_activo = StringField(max_length=100)
+    componentes = ListField(StringField())
+    estatus = StringField(max_length=50)
+    
     meta = {
-        'abstract': True
+        'db_alias': 'default',
+        'collection': 'Medicamento'
     }
-
-# Enfermero asociado
-
-class SensorData(Document):
-    Humedad = fields.IntField()
-    Temperatura = fields.IntField()
-    Proximidad = fields.IntField()
-
-    meta = {
-        'abstract': True
-    }
-
-class EstadoPastillero(Document):
-    activo = fields.BooleanField(default=True)
-    ultima_apertura = fields.DateTimeField(default=datetime.now)
-    ultimo_enfermero = fields.ReferenceField('EnfermeroMongo', reverse_delete_rule=NULLIFY)  
-    nivel_bateria = fields.IntField(default=100)
-
-    meta = {
-        'abstract': True
-    }
-
-
-class LogAcceso(Document):
-    fechaHora = fields.DateTimeField(default=datetime.now)
-    nfc_id = fields.StringField(max_length=100)
-    tipo_acceso = fields.StringField(max_length=20, choices=["apertura", "cierre"])
-
-    meta = {
-        'abstract': True
-    }
-
+    
+    @property
+    def id(self):
+        return self.pk
 
 class Pastillero(Document):
     codigo = fields.StringField(max_length=100, unique=True)
-    ubicacion = fields.DictField()  # Reemplazo de JSONField
-    Datos_Sensores = fields.ListField(fields.DictField(), default=[])
-    enfermeros_autorizados = fields.ListField(fields.ReferenceField('EnfermeroMongo'), default=[])
-    estado = fields.DictField()  # Reemplazo de JSONField
-    logs_acceso = fields.ListField(fields.DictField(), default=[])
-
+    ubicacion = fields.DictField(default={
+        "edificio": "",
+        "piso": None,
+        "area": "",
+        "cama": ""
+    })
+    datos_sensores = fields.DictField(default={
+        'humedad': None, 
+        'temperatura': None, 
+        'proximidad': None
+    })
+    enfermeros_autorizados = ListField(ReferenceField('EnfermeroMongo'), default=[])
+    estado = fields.DictField(default={
+        'activo': True,
+        'ultima_apertura': datetime.min.isoformat(), 
+        'ultimo_enfermero': None
+    })
+    logs_acceso = ListField(DictField(default={
+        'fechaHora': None,
+        'enfermero_id': '',
+        'tipo_acceso': ''
+    }), default=[])
+    medicamentos = ListField(ReferenceField('Medicamento'), default=[])
+    paciente = ReferenceField('Paciente', null=True)
+    
     meta = {
         'db_alias': 'default',
         'collection': 'Pastillero'
     }
+    
+    def to_dict(self):
+        return {
+            'id': str(self.id),
+            'codigo': self.codigo if hasattr(self, 'codigo') else '',
+            'ubicacion': self.ubicacion,
+            'datos_sensores': self.datos_sensores,
+            'estado': {
+                'activo': self.estado.get('activo', False),
+                'ultima_apertura': self.format_fecha(self.estado.get('ultima_apertura')),  
+                'ultimo_enfermero': str(self.estado.get('ultimo_enfermero')) if self.estado.get('ultimo_enfermero') else None
+            },
+            'paciente': str(self.paciente.id) if self.paciente else None,
+            'enfermeros_autorizados': [str(enfermero.id) for enfermero in self.enfermeros_autorizados if enfermero],
+            'medicamentos': [str(med.id) for med in self.medicamentos if med]
+        }
+    
+    def format_fecha(self, fecha):
+        if isinstance(fecha, str):
+            try:
+                fecha = datetime.fromisoformat(fecha)
+            except ValueError:
+                return None
+        return fecha.strftime("%Y-%m-%d %H:%M:%S") if fecha else None
+    
+    def get_medicamentos_details(self):
+        return [
+            {
+                'id': str(med.id),
+                'nombre_medicamento': med.nombre_medicamento if hasattr(med, 'nombre_medicamento') else '',
+                'ingrediente_activo': med.ingrediente_activo if hasattr(med, 'ingrediente_activo') else '',
+                'componentes': med.componentes if hasattr(med, 'componentes') else [],
+                'estatus': med.estatus if hasattr(med, 'estatus') else ''
+            } for med in self.medicamentos if med
+        ]
 
-# Dosis
-# poner los medicamentos
-# Poner los medicamenteos
-# Medicamento
 class HorarioPastillero(Document):
     pastillero = ReferenceField('Pastillero', required=True)
     medicamento = ReferenceField('Medicamento', required=True)
@@ -187,20 +213,7 @@ class Paciente(Document):
 
 # M E D I C A M E N T O
 
-class Medicamento(Document):
-    nombre_medicamento = fields.StringField(max_length=255)
-    ingrediente_activo = fields.StringField(max_length=255)
-    componentes = fields.StringField(null=True, blank=True)
-    estatus = fields.BooleanField(default=True)
-
-    meta = {
-        'db_alias': 'default',
-        'collection': 'Medicamento'
-    }
-
 # Poner el pastillero
-
-
     
 # Create your models here.
 class UserForm(forms.Form):

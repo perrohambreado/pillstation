@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <title>Detalles del Pastillero</title>
+    <link rel="stylesheet" href="{% static 'pastilleroDetalles.css' %}">
+</head>
+<body>
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <a href="{% url 'enfermero_dashboard' %}" class="btn">⬅</a>
+        <h1>Pastillero 0001</h1>
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <th colspan="1">Información General</th>
+            <th colspan="2">Ubicación</th>
+        </tr>
+        <tr>
+            <td  rowspan="2"><strong>Código:</strong> 0001</td>
+            <td><strong>Edificio:</strong> {{ pastillero.ubicacion.edificio }}</td>
+            <td><strong>Piso:</strong> {{ pastillero.ubicacion.piso }}</td>
+        </tr>
+        <tr>
+            <td><strong>Área:</strong> {{ pastillero.ubicacion.area }}</td>
+            <td><strong>Cama:</strong> {{ pastillero.ubicacion.cama }}</td>
+        </tr>
+    </table>
+
+    <h2>Estado Actual</h2>
+    <div class="estado-container">
+        <div class="estado-card">
+            <p>🌡 Temperatura</p>
+            <h3>{{ pastillero.datos_sensores.temperatura|default:"N/A" }}°C</h3>
+        </div>
+        <div class="estado-card">
+            <p>💧 Humedad</p>
+            <h3>{{ pastillero.datos_sensores.humedad|default:"N/A" }}%</h3>
+        </div>
+        <div class="estado-card">
+            <p>🔋 Batería</p>
+            <h3>100%</h3>
+        </div>
+    </div>
+
+    {% if pastillero.medicamentos %}
+    <h2>Medicamentos</h2>
+    <table class="medicamentos-table">
+        <thead>
+            <tr>
+                <th rowspan="2">Nombre</th>
+                <th rowspan="2">Ingrediente Activo</th>
+                <th colspan="2">Componentes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for med in pastillero.medicamentos %}
+            <tr>
+                <td>{{ med.nombre_medicamento|default:"" }}</td>
+                <td>{{ med.ingrediente_activo|default:"" }}</td>
+                <td>{{ med.componentes.0|default:"" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>Enfermeros Autorizados</h2>
+    <div class="enfermeros-container">
+        {% for enfermero in pastillero.enfermeros_autorizados %}
+        <div class="enfermero-card">
+            <p>👨‍⚕️ {{ enfermero.nombre }} {{ enfermero.apellidos }}</p>
+            <small>{{ enfermero.identificacion }}</small>
+        </div>
+        {% empty %}
+        <p>No hay otros enfermeros autorizados.</p>
+        {% endfor %}
+    </div>
+
+    <h2>Última Apertura</h2>
+    <table class="info-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Enfermero</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if ultima_apertura %}
+                <tr>
+                    <td>{{ ultima_apertura.fechaHora|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if ultimo_enfermero %}
+                            {{ ultimo_enfermero.nombre }} {{ ultimo_enfermero.apellidos }}
+                        {% else %}
+                            No disponible
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">No hay registros de apertura.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+     
+</div>
+{% endblock %}
+</body>
+</html>

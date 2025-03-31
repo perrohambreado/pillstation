@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
-from .models import UserForm, Enfermero, Paciente, Medicamento, Pastillero, HorarioPastillero, Administrador
+from .models import UserForm, EnfermeroMongo, Enfermero, Paciente, Medicamento, Pastillero, HorarioPastillero, Administrador
 from .forms import AdministradorForm, EnfermeroForm, PacienteForm, MedicamentoForm, HorarioPastilleroForm, CustomUserCreationForm
 from pymongo import MongoClient
 from mongoengine.errors import DoesNotExist
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 from django.contrib import messages
 from django.http import HttpResponseForbidden, HttpResponse
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from .signals import sync_nurse_to_mongo, sync_admin_to_mongo, eliminar_admin_de_mongo, eliminar_enfermero_de_mongo   
+from .signals import sync_nurse_to_mongo, sync_admin_to_mongo, eliminar_admin_de_mongo, eliminar_enfermero_de_mongo, sync_pastillero_relation   
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST, require_GET
 
 client = MongoClient("mongodb+srv://regina:pKW6Ir1kXLapHf5u@pillstation.c4ue9.mongodb.net/?retryWrites=true&w=majority&appName=PillStation")
 db = client["PillStation"]
@@ -29,7 +31,7 @@ def login_view(request):
             if user.tipo_usuario == 'admin':
                 return redirect('admin_select_dashboard') 
             elif user.tipo_usuario == 'enfermero':
-                return redirect('nurse_dashboard')  
+                return redirect('enfermero_dashboard')  
             else:
                 return redirect('home')
         else:
@@ -178,7 +180,7 @@ def eliminar_administrador(request, pk):
 # Vista del dashboard para el Administrador
 @login_required
 def nurse_dashboard(request):
-    if not request.user.admin:
+    if not request.user.is_staff: 
         return HttpResponseForbidden("Acceso denegado")
     
     return render(request, 'nurse_dashboard.html')
@@ -222,7 +224,6 @@ def crear_enfermero(request):
             nuevo_enfermero = enfermero_form.save(commit=False)   
             nuevo_enfermero.usuario = nuevo_usuario
             nuevo_enfermero.save()  
-
 
             sync_nurse_to_mongo(nuevo_enfermero)
 
@@ -692,3 +693,266 @@ def eliminar_horario(request, pk):
 def add(request):
     if request.method == 'POST':
         user = request.POST['user']
+
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render
+from .models import Enfermero, Pastillero
+from bson import ObjectId
+
+@login_required
+def enfermero_dashboard(request):
+    if not hasattr(request.user, 'enfermero'):
+        messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
+        return redirect('home')
+    
+    enfermero = request.user.enfermero
+    
+    pastilleros = enfermero.get_pastilleros()
+    
+    context = {
+        'enfermero': enfermero,
+        'pastilleros': pastilleros
+    }
+    
+    return render(request, 'enfermero/dashboard.html', context)
+
+@login_required
+@require_GET
+def listar_pastilleros_disponibles(request):
+    if not hasattr(request.user, 'enfermero'):
+        messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
+        return redirect('home')
+    
+    from myapp.models import EnfermeroMongo
+    enfermero_mongo = EnfermeroMongo.objects(usuario_id=request.user.id).first()
+    
+    pastilleros = Pastillero.objects().all()
+    
+    for p in pastilleros:
+        if enfermero_mongo:
+            enfermeros_ids = [str(ref.id) for ref in p.enfermeros_autorizados]
+            p.asignado = str(enfermero_mongo.id) in enfermeros_ids
+        else:
+            p.asignado = False
+    
+    context = {
+        'pastilleros': pastilleros
+    }
+    
+    return render(request, 'enfermero/pastilleros_disponibles.html', context)
+
+@login_required
+@require_POST
+def asignar_pastillero(request):
+    if not hasattr(request.user, 'enfermero'):
+        messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
+        return redirect('home')
+    
+    pastillero_id = request.POST.get('pastillero_id')
+    
+    if not pastillero_id:
+        messages.error(request, 'ID de pastillero no proporcionado')
+        return redirect('enfermero_dashboard')
+    
+    try:
+        pastillero_id = str(ObjectId(pastillero_id))
+    except:
+        messages.error(request, 'ID de pastillero inválido')
+        return redirect('enfermero_dashboard')
+    
+    success = sync_pastillero_relation(
+        enfermero_id=request.user.enfermero.id,
+        pastillero_id=pastillero_id,
+        add=True
+    )
+    
+    if success:
+        messages.success(request, 'Pastillero asignado correctamente')
+    else:
+        messages.error(request, 'Error al asignar pastillero')
+    
+    return redirect('enfermero_dashboard')
+
+@login_required
+@require_POST
+def desasignar_pastillero(request):
+    if not hasattr(request.user, 'enfermero'):
+        messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
+        return redirect('home')
+    
+    pastillero_id = request.POST.get('pastillero_id')
+    
+    if not pastillero_id:
+        messages.error(request, 'ID de pastillero no proporcionado')
+        return redirect('enfermero_dashboard')
+    
+    try:
+        pastillero_id = str(ObjectId(pastillero_id))
+    except:
+        messages.error(request, 'ID de pastillero inválido')
+        return redirect('enfermero_dashboard')
+    
+    success = sync_pastillero_relation(
+        enfermero_id=request.user.enfermero.id,
+        pastillero_id=pastillero_id,
+        add=False
+    )
+    
+    if success:
+        messages.success(request, 'Pastillero desasignado correctamente')
+    else:
+        messages.error(request, 'Error al desasignar pastillero')
+    
+    return redirect('enfermero_dashboard')
+
+@login_required
+def ver_detalle_pastillero(request, pastillero_id):
+    if not hasattr(request.user, 'enfermero'):
+        messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
+        return redirect('home')
+    
+    try:
+        enfermero_mongo = EnfermeroMongo.objects(usuario_id=request.user.id).first()
+        
+        if not enfermero_mongo:
+            messages.error(request, 'No se encontró su perfil de enfermero')
+            return redirect('enfermero_dashboard')
+            
+        pastillero = Pastillero.objects.get(id=pastillero_id)
+        
+        if pastillero.medicamentos:
+            for i, med_ref in enumerate(pastillero.medicamentos):
+                try:
+                    medicamento = Medicamento.objects.get(id=med_ref.id)
+                    pastillero.medicamentos[i] = medicamento
+                except Exception as e:
+                    print(f"Error al cargar medicamento: {e}")
+        
+        if pastillero.paciente:
+            try:
+                paciente = Paciente.objects.get(id=pastillero.paciente.id)
+                pastillero.paciente = paciente
+            except Exception as e:
+                print(f"Error al cargar paciente: {e}")
+        
+        ultima_apertura = None
+        enfermero_ultima_apertura = None
+        
+        if pastillero.estado.get('ultima_apertura') and pastillero.estado.get('ultima_apertura') != datetime.min.isoformat():
+            ultima_apertura_datetime = datetime.fromisoformat(pastillero.estado['ultima_apertura'])
+            ultima_apertura = {
+                'fechaHora': ultima_apertura_datetime
+            }
+            
+            if pastillero.estado.get('ultimo_enfermero'):
+                try:
+                    enfermero_ultima_apertura = EnfermeroMongo.objects.get(id=pastillero.estado['ultimo_enfermero'])
+                except Exception as e:
+                    print(f"Error al cargar enfermero de última apertura: {e}")
+        
+        elif pastillero.logs_acceso:
+            logs_ordenados = sorted(pastillero.logs_acceso, 
+                                  key=lambda x: x['fechaHora'] if x['fechaHora'] else datetime.min,
+                                  reverse=True)
+            
+            ultima_apertura = logs_ordenados[0]  
+            try:
+                enfermero_ultima_apertura = EnfermeroMongo.objects.get(id=ultima_apertura['enfermero_id'])
+            except Exception as e:
+                print(f"Error al cargar enfermero de última apertura: {e}")
+        
+    except Exception as e:
+        messages.error(request, f'Pastillero no encontrado: {str(e)}')
+        return redirect('enfermero_dashboard')
+    
+    enfermeros_ids = [str(ref.id) for ref in pastillero.enfermeros_autorizados]
+    if str(enfermero_mongo.id) not in enfermeros_ids:
+        messages.error(request, 'No tienes acceso a este pastillero')
+        return redirect('enfermero_dashboard')
+    
+    context = {
+        'pastillero': pastillero,
+        'ultima_apertura': ultima_apertura,
+        'ultimo_enfermero': enfermero_ultima_apertura
+    }
+    
+    return render(request, 'enfermero/detalle_pastillero.html', context)
+
+@login_required
+@require_GET
+def api_pastilleros_disponibles(request):
+    if not hasattr(request.user, 'enfermero'):
+        return JsonResponse({'error': 'Acceso no autorizado'}, status=403)
+    
+    from myapp.models import EnfermeroMongo
+    enfermero_mongo = EnfermeroMongo.objects(usuario_id=request.user.id).first()
+    
+    if not enfermero_mongo:
+        return JsonResponse({'error': 'No se encontró su perfil de enfermero'}, status=404)
+    
+    pastilleros = Pastillero.objects.all()
+    
+    pastilleros_data = []
+    for p in pastilleros:
+        data = p.to_dict()
+        enfermeros_ids = [str(ref.id) for ref in p.enfermeros_autorizados]
+        data['asignado'] = str(enfermero_mongo.id) in enfermeros_ids
+        pastilleros_data.append(data)
+    
+    return JsonResponse({'pastilleros': pastilleros_data})
+
+@login_required
+@require_POST
+def api_asignar_pastillero(request):
+    if not hasattr(request.user, 'enfermero'):
+        return JsonResponse({'error': 'Acceso no autorizado'}, status=403)
+    
+    pastillero_id = request.POST.get('pastillero_id')
+    
+    if not pastillero_id:
+        return JsonResponse({'error': 'ID de pastillero no proporcionado'}, status=400)
+    
+    try:
+        pastillero_id = str(ObjectId(pastillero_id))
+    except:
+        return JsonResponse({'error': 'ID de pastillero inválido'}, status=400)
+    
+    success = sync_pastillero_relation(
+        enfermero_id=request.user.enfermero.id,
+        pastillero_id=pastillero_id,
+        add=True
+    )
+    
+    if success:
+        return JsonResponse({'success': True, 'message': 'Pastillero asignado correctamente'})
+    else:
+        return JsonResponse({'error': 'Error al asignar pastillero'}, status=500)
+
+@login_required
+@require_POST
+def api_desasignar_pastillero(request):
+    if not hasattr(request.user, 'enfermero'):
+        return JsonResponse({'error': 'Acceso no autorizado'}, status=403)
+    
+    pastillero_id = request.POST.get('pastillero_id')
+    
+    if not pastillero_id:
+        return JsonResponse({'error': 'ID de pastillero no proporcionado'}, status=400)
+    
+    try:
+        pastillero_id = str(ObjectId(pastillero_id))
+    except:
+        return JsonResponse({'error': 'ID de pastillero inválido'}, status=400)
+    
+    success = sync_pastillero_relation(
+        enfermero_id=request.user.enfermero.id,
+        pastillero_id=pastillero_id,
+        add=False
+    )
+    
+    if success:
+        return JsonResponse({'success': True, 'message': 'Pastillero desasignado correctamente'})
+    else:
+        return JsonResponse({'error': 'Error al desasignar pastillero'}, status=500)

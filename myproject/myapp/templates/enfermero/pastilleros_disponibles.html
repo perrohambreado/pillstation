@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastilleros Disponibles</title>
+    <link rel="stylesheet" href="{% static 'pastillerosDisponibles.css' %}">
+</head>
+<body>
+
+{% block content %}
+<div class="container">
+    
+    <div class="header">
+            <a href="{% url 'enfermero_dashboard' %}" class="btnn">⬅</a>
+            <h1>Pastilleros Disponibles</h1>
+    </div>
+    
+    <div class="row" id="pastilleros-container">
+
+        {% if pastilleros %}
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Ubicación</th>
+                        <th>Temperatura</th>
+                        <th>Humedad</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pastillero in pastilleros %}
+                        <tr>
+                            <td>0001</td>
+                            <td>
+                                <ul>
+                                    <li>Edificio: {{ pastillero.ubicacion.edificio }}</li>
+                                    <li>Piso: {{ pastillero.ubicacion.piso }}</li>
+                                    <li>Área: {{ pastillero.ubicacion.area }}</li>
+                                    <li>Cama: {{ pastillero.ubicacion.cama }}</li>
+                                </ul>
+                            </td>
+                            <td>{{ pastillero.datos_sensores.temperatura }}°C</td>
+                            <td>{{ pastillero.datos_sensores.humedad }}%</td>
+                            <td>
+                                <form action="{% url 'asignar_pastillero' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pastillero_id" value="{{ pastillero.id }}">
+                                    <button type="submit" class="btn btn-primary {% if pastillero.asignado %}disabled{% endif %}" 
+                                        {% if pastillero.asignado %}disabled{% endif %}>
+                                        {% if pastillero.asignado %}Ya asignado{% else %}Asignar{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">No hay pastilleros disponibles para asignar.</div>
+            </div>
+        {% endif %}
+    </div>    
+    
+</div>
+{% endblock %}
+
+</body>
+</html>

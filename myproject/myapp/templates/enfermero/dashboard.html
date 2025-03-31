@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pastilleros</title>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'nurseDashboard.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Hola,  {{ enfermero.nombre }} {{ enfermero.apellidos }}</h1>
+            <div>
+                <a href="{% url 'listar_pastilleros_disponibles' %}" class="btn">
+                    <i class="fas fa-plus"></i> Agregar Pastillero
+                </a>
+            </div>
+        </header>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Mis Pastilleros</h5>
+            </div>
+            <div class="card-body">
+                {% if pastilleros %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Ubicación</th>
+                                <th>Temperatura</th>
+                                <th>Humedad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pastillero in pastilleros %}
+                                <tr>
+                                    <td>0001</td>
+                                    <td>
+                                        <ul>
+                                            <li>Edificio: {{ pastillero.ubicacion.edificio }}</li>
+                                            <li>Piso: {{ pastillero.ubicacion.piso }}</li>
+                                            <li>Área: {{ pastillero.ubicacion.area }}</li>
+                                            <li>Cama: {{ pastillero.ubicacion.cama }}</li>
+                                        </ul>
+                                    </td>                                    
+                                    <td>{{ pastillero.datos_sensores.temperatura }}°C</td>
+                                    <td>{{ pastillero.datos_sensores.humedad }}%</td>
+                                    <td>
+                                        <a href="{% url 'ver_detalle_pastillero' pastillero.pk %}" class="btn detail-btn">
+                                            <i class="fas fa-eye"></i> Ver detalles
+                                        </a>
+                                        <form action="{% url 'desasignar_pastillero' %}" method="post" onsubmit="return confirm('¿Está seguro que desea desasignar este pastillero?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="pastillero_id" value="{{ pastillero.pk }}">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-unlink"></i> Desasignar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        No tienes pastilleros asignados. Haz clic en "Agregar Pastillero" para empezar.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
