@@ -5,10 +5,8 @@ from django.utils import timezone
 from mongoengine import Document, EmailField, BooleanField, DateTimeField, fields, NULLIFY, CASCADE, StringField, ReferenceField, IntField, ListField
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime    
-
-
+from mongoengine import Document, EmailField, fields, StringField, ReferenceField, IntField, ListField, EmailField, BooleanField
 # U S U A R I O S
-
 class User(AbstractUser):
     telefono = models.CharField(max_length=15, blank=True, null=True)
     tipo_usuario = models.CharField(max_length=20, choices=[
@@ -25,20 +23,15 @@ class User(AbstractUser):
 
 # A M I N I S T R A D O R
 from django.conf import settings
-
-
 # Administrador - Modelo SQLite
 class Administrador(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin')
     departamento = models.CharField(max_length=100, blank=True, null=True)
-    nivel_acceso = models.IntegerField(default=1)
-    
+    nivel_acceso = models.IntegerField(default=1)  
     class Meta:
         db_table = 'administradores'
-        
     def __str__(self):
         return self.usuario.username
-
 # Administrador - Modelo espejo MongoDB
 class MongoAdministrador(Document):
     usuario_id = IntField(primary_key=True)  # ID del usuario en SQLite
@@ -50,14 +43,11 @@ class MongoAdministrador(Document):
     departamento = StringField(max_length=100, null=True)
     nivel_acceso = IntField(default=1)
     telefono = StringField(max_length=15, null=True)
-
     meta = {'collection': 'Administrador'}
-
     def __str__(self):
         return self.username
 
 # E N F E R M E R O S
-
 # Enfermero - Modelo SQLite
 class Enfermero(models.Model):
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='enfermero')
@@ -73,20 +63,14 @@ class Enfermero(models.Model):
     fecha_registro = models.DateTimeField(auto_now_add=True)
     estatus = models.BooleanField(default=True)
     telefono_cel = models.CharField(max_length=15)
-
     def get_pastilleros(self):
         from myapp.models import Pastillero  # Importa el modelo de MongoDB
         pastillero_ids = self.pastilleros.values_list('pastillero_id', flat=True)
         return Pastillero.objects(id__in=pastillero_ids)
-
     class Meta:
         db_table = 'enfermeros'
-    
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
-
-    
-from mongoengine import Document, EmailField, fields, StringField, ReferenceField, IntField, ListField, EmailField, BooleanField
     
 class EnfermeroMongo(Document):
     usuario_id = IntField(required=True, unique=True)
