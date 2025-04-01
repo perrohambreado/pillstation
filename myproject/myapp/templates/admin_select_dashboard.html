@@ -1,18 +1,25 @@
-<!-- admin_select_dashboard.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selección de Dashboard</title>
+    <title>Administrador</title>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminDashboard.css' %}">
 </head>
 <body>
-    <h1>Bienvenido, Admin</h1>
-    <p>Elige una opción:</p>
-    
-    <ul>
-        <li><a href="{% url 'listar_administradores' %}">Listar Administradores</a></li>
-        <li><a href="{% url 'listar_enfermeros' %}">Listar Enfermeros</a></li>
-    </ul>
+    <div class="container">
+        <header class="header">
+            <h1>Bienvenido</h1>
+        </header>
+
+        <div class="options-container">
+            <div class="button-group">
+                <a href="{% url 'listar_administradores' %}" class="option-link">Listar Administradores</a>
+                <a href="{% url 'listar_enfermeros' %}" class="option-link">Listar Enfermeros</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

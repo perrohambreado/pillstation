@@ -1,26 +1,62 @@
-<!-- templates/admin/edit.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'adminEdit.css' %}">  
     <meta charset="UTF-8">
+    <script src="https://kit.fontawesome.com/c51f852900.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Administrador</title>
 </head>
 <body>
-    <h1>Editar Administrador</h1>
-    <form method="post">
-        {% csrf_token %}
-        <div>
-            <h2>Editar Usuario</h2>
-            {{ user_form.as_p }}
-        </div>
-        <div>
-            <h2>Editar Administrador</h2>
-            {{ admin_form.as_p }}
-        </div>
-        <button type="submit">Guardar cambios</button>
-    </form>
+    <header></header>
+
+    <div class="loginFormm">
+        <form class="loginForm" method="post">
+            {% csrf_token %}
+            <div class="header">
+                <a href="{% url 'listar_administradores' %}" class="btnn">⬅</a>
+                <h2>Editar Administrador</h2>
+            </div>
+            
+            <div class="input-container">
+                <i class="fas fa-user"></i>
+                {{ user_form.username }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-envelope"></i>
+                {{ user_form.email }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-lock"></i>
+                {{ user_form.password1 }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-lock"></i>
+                {{ user_form.password2 }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-phone"></i>
+                {{ user_form.telefono }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-id-badge"></i>
+                <select name="{{ user_form.tipo_usuario.name }}" class="custom-select">
+                    <option value="admin" selected>Administrador</option>
+                </select>
+            </div>            
+            <div class="input-container">
+                <i class="fas fa-building"></i>
+                {{ admin_form.departamento }}
+            </div>
+            <div class="input-container">
+                <i class="fas fa-key"></i>
+                <input type="number" name="{{ admin_form.nivel_acceso.name }}" class="number-input" placeholder="Ingrese número" min="0" max="5" step="1">
+            </div>
+            <button type="submit">Guardar cambios</button>
+        </form>
+    </div>
     <br>
-    <a href="{% url 'listar_administradores' %}">Volver al listado de administradores</a>
 </body>
 </html>

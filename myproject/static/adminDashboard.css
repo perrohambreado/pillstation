@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "League Spartan", sans-serif;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: linear-gradient(to left, rgb(255, 255, 255) 50%, rgb(23, 38, 45) 50%);
+}
+
+h1 {
+  color: rgb(0, 0, 0);
+  font-weight: lighter;
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  max-width: 60vw;
+  margin: 30px auto;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(193, 193, 193, 0.421);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10vh;
+  background-color: rgb(255, 255, 255);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.options-container {
+  background-color: rgb(255, 255, 255);
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+p {
+  font-size: 18px;
+  color: rgb(23, 38, 45);
+  margin-bottom: 20px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;  /* Adds space between buttons */
+}
+
+.option-link {
+  display: inline-block;
+  text-decoration: none;
+  color: rgb(23, 38, 45);
+  font-size: 16px;
+  padding: 10px 20px;
+  border: 2px solid rgb(23, 38, 45);
+  border-radius: 5px;
+  background-color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: 200;
+  width: 200px;
+
+}
+
+.option-link:hover {
+  background-color: rgb(23, 38, 45);
+  color: white;
+}

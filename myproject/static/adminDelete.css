@@ -1,0 +1,161 @@
+* {
+  box-sizing: border-box;
+  font-family: "League Spartan", sans-serif;
+  margin: 0rem;
+}
+
+body {
+  height: 100vh;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(45deg, rgb(37, 49, 55) 50%, rgb(23, 38, 45) 50%);
+}
+
+h2 {
+  color: white;
+  font-weight: lighter;
+}
+
+h3 {
+  color: white;
+  font-weight: lighter;
+  margin-bottom: 20px;
+}
+
+.btnn {
+  text-decoration: none;
+  font-weight: lighter;
+  color: white;
+  background-color: transparent;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btnn:hover {
+  transform: scale(1.2);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+a:hover {
+  transform: scale(1.05);
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.482);
+  padding: 2rem;
+  height: fit-content;
+  width: 500px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+form h2 {
+  display: block;
+  font-size: 2em;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  font-weight: lighter;
+  margin-top: 0%;
+  margin-bottom: 45px;
+}
+
+/* Contenedor de botones alineados en fila */
+.buttons-container {
+  display: flex;
+  justify-content: center; /* Centra los botones horizontalmente */
+  gap: 10px; /* Espacio entre los botones */
+  width: 100%; /* Asegura que los botones ocupen todo el ancho */
+}
+
+button, .login {
+  width: 48%; /* El mismo tamaño para ambos botones */
+  padding: 12px 20px; /* Tamaño de padding igual */
+  border-radius: 20px; /* Borde redondeado */
+  font-size: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.4s ease, transform 0.4s;
+}
+
+button {
+  background: #ffffff;
+  border: none;
+  color: rgb(23, 38, 45);
+}
+
+button:hover {
+  background: rgb(23, 38, 45);
+  transform: scale(1.05);
+  color: white;
+}
+
+.login {
+  border:none;
+  background-color: rgb(23, 38, 45);
+  color: white;
+  font-family: "League Spartan", sans-serif;
+  font-weight: normal;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-around; /* Alinea los elementos */
+  gap: 10px;
+  width: 350px; /* Ancho fijo */
+  margin: 0 auto; /* Centrado horizontal */
+  box-sizing: border-box;
+  margin-bottom: 25px;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+/* Añade esto a tu CSS existente o reemplaza las partes correspondientes */
+
+/* Elimina width: 48% de los estilos de button y .login */
+button, .login {
+  width: auto; /* En lugar de un porcentaje fijo */
+  padding: 12px 20px;
+  border-radius: 20px;
+  font-size: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.4s ease, transform 0.4s;
+  text-decoration: none; /* Para asegurar que .login (enlace) no tenga subrayado */
+  display: inline-block; /* Para que ambos elementos se comporten como bloques en línea */
+}
+
+/* Contenedor para los botones */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* Ajusta el ancho de ambos botones para que sean iguales */
+.button-container button, 
+.button-container .login {
+  flex: 1; /* Hace que ambos botones ocupen el mismo espacio */
+  max-width: 45%; /* Limita el ancho máximo */
+}

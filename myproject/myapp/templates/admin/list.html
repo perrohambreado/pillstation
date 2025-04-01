@@ -1,41 +1,60 @@
-<!-- templates/admin/list.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
     <title>Listado de Administradores</title>
+    <link rel="stylesheet" href="{% static 'adminList.css' %}">
 </head>
 <body>
-    <h1>Listado de Administradores</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Departamento</th>
-                <th>Nivel de Acceso</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for administrador in administradores %}
-                <tr>
-                    <td>{{ administrador.usuario.username }}</td>
-                    <td>{{ administrador.departamento }}</td>
-                    <td>{{ administrador.nivel_acceso }}</td>
-                    <td>
-                        <a href="{% url 'editar_administrador' administrador.pk %}">Editar</a> |
-                        <a href="{% url 'eliminar_administrador' administrador.pk %}">Eliminar</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4">No hay administradores registrados</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="container">
+        <header class="header">
+            <a href="{% url 'admin_select_dashboard' %}" class="btnn">⬅</a>
+            <h1>Listado de Administradores</h1>
+        </header>
+        <div class="row" id="administradores-container">
+        {% if administradores %}
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Departamento</th>
+                        <th>Nivel de Acceso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for administrador in administradores %}
+                        <tr>
+                            <td>{{ administrador.usuario.username }}</td>
+                            <td>{{ administrador.departamento }}</td>
+                            <td>{{ administrador.nivel_acceso }}</td>
+                            <td class="nose">
+                                <a href="{% url 'editar_administrador' administrador.pk %}" class="btn">Editar</a>
+                                <a href="{% url 'eliminar_administrador' administrador.pk %}" class="btnD">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No hay administradores registrados</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">No hay administradores disponibles.</div>
+            </div>
+        {% endif %}
+    </div>
+
     <br>
-    <a href="{% url 'crear_administrador' %}">Crear nuevo administrador</a>
+        <div class="r">
+            <a href="{% url 'crear_administrador' %}" class="btnnn">Crear nuevo administrador</a>
+        </div>
+    </div>
+
 </body>
 </html>
