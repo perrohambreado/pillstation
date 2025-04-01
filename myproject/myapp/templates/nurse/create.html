@@ -1,66 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'nurseCreate.css' %}">  
     <meta charset="UTF-8">
+    <script src="https://kit.fontawesome.com/c51f852900.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Enfermero</title>
 </head>
 <body>
-    <h1>Crear Enfermero</h1>
-    
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <h3>Usuario</h3>
-            {{ user_form.as_p }}
-        </div>
-        
-        <div class="form-group">
-            <h3>Datos del Enfermero</h3>
-            <!-- Destacar los campos nombre y apellidos -->
-            <div class="important-fields">
-                <p>
-                    <label for="id_nombre">Nombre:</label>
-                    {{ enfermero_form.nombre }}
-                    {% if enfermero_form.nombre.errors %}
-                    <span class="error">{{ enfermero_form.nombre.errors }}</span>
-                    {% endif %}
-                </p>
-                <p>
-                    <label for="id_apellidos">Apellidos:</label>
-                    {{ enfermero_form.apellidos }}
-                    {% if enfermero_form.apellidos.errors %}
-                    <span class="error">{{ enfermero_form.apellidos.errors }}</span>
-                    {% endif %}
-                </p>
+    <div class="loginFormm">
+        <form class="loginForm" method="post">
+            {% csrf_token %}
+            <div class="header">
+                <a href="{% url 'listar_enfermeros' %}" class="btnn">⬅</a>
+                <h2>Crear Enfermero</h2>
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-user"></i>
+                <input type="text" name="{{ user_form.username.name }}" placeholder="Nombre de usuario" id="{{ user_form.username.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="{{ user_form.email.name }}" placeholder="Correo electrónico" id="{{ user_form.email.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="{{ user_form.password1.name }}" placeholder="Contraseña" id="{{ user_form.password1.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="{{ user_form.password2.name }}" placeholder="Confirmar contraseña" id="{{ user_form.password2.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-phone"></i>
+                <input type="text" name="{{ user_form.telefono.name }}" placeholder="Teléfono" id="{{ user_form.telefono.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-id-badge"></i>
+                <select name="{{ user_form.tipo_usuario.name }}" class="custom-select" id="{{ user_form.tipo_usuario.id_for_label }}">
+                    <option value="enfermero" selected>Enfermero</option>
+                </select>
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-user"></i>
+                <input type="text" name="{{ enfermero_form.nombre.name }}" placeholder="Nombre" id="{{ enfermero_form.nombre.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-user"></i>
+                <input type="text" name="{{ enfermero_form.apellidos.name }}" placeholder="Apellidos" id="{{ enfermero_form.apellidos.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-id-card"></i>
+                <input type="text" name="{{ enfermero_form.nfc_id.name }}" placeholder="ID NFC" id="{{ enfermero_form.nfc_id.id_for_label }}">
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-clock"></i>
+                <select name="{{ enfermero_form.turno.name }}" class="custom-select" id="{{ enfermero_form.turno.id_for_label }}">
+                    <option value="Matutino">Matutino</option>
+                    <option value="Vespertino">Vespertino</option>
+                    <option value="Nocturno">Nocturno</option>
+                </select>
+            </div>
+
+            <div class="input-container">
+                <i class="fas fa-check-circle"></i>
+                <label>
+                    <input type="checkbox" name="{{ enfermero_form.activo.name }}" id="{{ enfermero_form.activo.id_for_label }}"> Activo
+                </label>
             </div>
             
-            <!-- Resto de los campos -->
-            {% for field in enfermero_form %}
-                {% if field.name != 'nombre' and field.name != 'apellidos' %}
-                <p>
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {% if field.errors %}
-                    <span class="error">{{ field.errors }}</span>
-                    {% endif %}
-                </p>
-                {% endif %}
-            {% endfor %}
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Crear Enfermero</button>
-    </form>
+            <button type="submit">Crear Enfermero</button>
+        </form>
+    </div>
+    <br>
 </body>
 </html>

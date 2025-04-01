@@ -26,6 +26,7 @@ h3 {
   color: white;
   font-weight: lighter;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .btnn {
@@ -78,15 +79,15 @@ form h2 {
 
 .buttons-container {
   display: flex;
-  justify-content: center; 
-  gap: 10px;
+  justify-content: center;
+  gap: 10px; 
   width: 100%; 
 }
 
 button, .login {
-  width: 48%;
-  padding: 12px 20px; 
-  border-radius: 20px;
+  width: 48%; 
+  padding: 12px 20px;
+  border-radius: 20px; 
   font-size: 1rem;
   text-align: center;
   cursor: pointer;
@@ -119,7 +120,7 @@ button:hover {
   justify-content: space-around;
   gap: 10px;
   width: 350px; 
-  margin: 0 auto; 
+  margin: 0 auto;
   box-sizing: border-box;
   margin-bottom: 25px;
 }
@@ -137,7 +138,7 @@ button, .login {
   cursor: pointer;
   transition: background-color 0.4s ease, transform 0.4s;
   text-decoration: none; 
-  display: inline-block;
+  display: inline-block; 
 }
 
 .button-container {
@@ -151,5 +152,5 @@ button, .login {
 .button-container button, 
 .button-container .login {
   flex: 1; 
-  max-width: 45%; 
+  max-width: 45%;
 }

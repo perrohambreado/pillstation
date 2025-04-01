@@ -1,35 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'nurseList.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Enfermeros</title>
 </head>
 <body>
-    <h2>Lista de Enfermeros</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Turno</th>
-          <th>Teléfono</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for enfermero in enfermeros %}
-          <tr>
-            <td>{{ enfermero.nombre }} {{ enfermero.apellidos }}</td>
-            <td>{{ enfermero.turno }}</td>
-            <td>{{ enfermero.telefono_cel }}</td>
-            <td>
-              <a href="{% url 'editar_enfermero' enfermero.pk %}" class="btn btn-warning btn-sm">Editar</a>
-              <a href="{% url 'eliminar_enfermero' enfermero.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <a href="{% url 'crear_enfermero' %}" class="btn btn-success">Crear Nuevo Enfermero</a>
+    <div class="container">
+        <header class="header">
+            <a href="{% url 'admin_select_dashboard' %}" class="btnn">⬅</a>
+            <h1>Lista de Enfermeros</h1>
+        </header>
+        <div class="row" id="enfermeros-container">
+        {% if enfermeros %}
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre y Apellidos</th>
+                        <th>Turno</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enfermero in enfermeros %}
+                        <tr>
+                            <td>{{ enfermero.usuario.username }}</td>
+                            <td>{{ enfermero.nombre }} {{ enfermero.apellidos }}</td>
+                            <td>{{ enfermero.turno }}</td>
+                            <td>{{ enfermero.usuario.telefono }}</td>                            <td class="nose">
+                                <a href="{% url 'editar_enfermero' enfermero.pk %}" class="btn">Editar</a>
+                                <a href="{% url 'eliminar_enfermero' enfermero.pk %}" class="btnD">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">No hay enfermeros registrados</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">No hay enfermeros disponibles.</div>
+            </div>
+        {% endif %}
+        </div>
+        <br>
+        <div class="r">
+            <a href="{% url 'crear_enfermero' %}" class="btnnn">Crear Nuevo Enfermero</a>
+        </div>
+    </div>
 </body>
 </html>
