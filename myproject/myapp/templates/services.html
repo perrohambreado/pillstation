@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'services.css' %}">
+  <title>Nuestros Servicios</title>
+</head>
+<body>
+  <section class="sectione">
+    <header>
+      <div class="left">
+        <a href="{% url 'home' %}"><h2>PillStation</h2></a>
+        <div class="nav-buttons">
+          <button onclick="window.location.href='{% url 'aboutUs' %}'">Sobre nosotros</button>
+          <button onclick="window.location.href='{% url 'services' %}'">Nuestros servicios</button>
+        </div>
+      </div>
+      <div class="right">
+        <button class="login" onclick="window.location.href='{% url 'login' %}'">Iniciar sesión</button>
+      </div>
+    </header>
+
+    <div class="main">
+      <h1>Nuestros Servicios</h1>
+      <p>Soluciones innovadoras para la administración eficiente de medicamentos.</p>
+
+      <div class="services-container">
+        <div class="service">
+          <h3>Aplicación Móvil</h3>
+          <p>Administra y monitorea la dispensación de medicamentos desde cualquier lugar con nuestra app intuitiva y segura.</p>
+        </div>
+
+        <div class="service">
+          <h3>Página Web</h3>
+          <p>Accede a reportes, gestiona inventarios y optimiza procesos hospitalarios con nuestra plataforma en línea.</p>
+        </div>
+
+        <div class="service">
+          <h3>Dispositivo Inteligente</h3>
+          <p>Automatiza la dispensación de medicamentos en hospitales, reduciendo errores y mejorando la seguridad.</p>
+        </div>
+      </div>
+
+      <button class="contact-btn" >Contáctanos</button>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-bottom">&copy; 2025 PillStation | Todos los derechos reservados</p>
+  </footer>
+</body>
+</html>

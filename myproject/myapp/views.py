@@ -47,7 +47,10 @@ def logout_view(request):
     return redirect('login') 
 
 # Vista para que el administrador elija qué listar
+
 @login_required
+
+
 def admin_select_dashboard(request):
     if request.user.tipo_usuario != 'admin':
         return HttpResponseForbidden("Acceso denegado")
@@ -155,7 +158,6 @@ def listar_administradores(request):
     return render(request, 'admin/list.html', {'administradores': administradores})
 
 # Eliminar administrador
-
 def eliminar_administrador(request, pk):
     try:
         administrador = Administrador.objects.get(id=pk)
@@ -327,6 +329,13 @@ def loginn(request):
 
 def home(request):
     return render(request, 'home.html')
+
+
+def aboutUs(request):
+    return render(request, 'aboutUs.html')
+
+def services(request):
+    return render(request, 'services.html')
 
 def userHome(request):
     return render(request, 'home.html')
@@ -812,16 +821,12 @@ def ver_detalle_pastillero(request, pastillero_id):
     if not hasattr(request.user, 'enfermero'):
         messages.error(request, 'Acceso no autorizado. Necesitas ser un enfermero para acceder a esta página.')
         return redirect('home')
-    
     try:
         enfermero_mongo = EnfermeroMongo.objects(usuario_id=request.user.id).first()
-        
         if not enfermero_mongo:
             messages.error(request, 'No se encontró su perfil de enfermero')
             return redirect('enfermero_dashboard')
-            
         pastillero = Pastillero.objects.get(id=pastillero_id)
-        
         if pastillero.medicamentos:
             for i, med_ref in enumerate(pastillero.medicamentos):
                 try:
@@ -829,55 +834,45 @@ def ver_detalle_pastillero(request, pastillero_id):
                     pastillero.medicamentos[i] = medicamento
                 except Exception as e:
                     print(f"Error al cargar medicamento: {e}")
-        
         if pastillero.paciente:
             try:
                 paciente = Paciente.objects.get(id=pastillero.paciente.id)
                 pastillero.paciente = paciente
             except Exception as e:
                 print(f"Error al cargar paciente: {e}")
-        
         ultima_apertura = None
         enfermero_ultima_apertura = None
-        
         if pastillero.estado.get('ultima_apertura') and pastillero.estado.get('ultima_apertura') != datetime.min.isoformat():
             ultima_apertura_datetime = datetime.fromisoformat(pastillero.estado['ultima_apertura'])
             ultima_apertura = {
                 'fechaHora': ultima_apertura_datetime
             }
-            
             if pastillero.estado.get('ultimo_enfermero'):
                 try:
                     enfermero_ultima_apertura = EnfermeroMongo.objects.get(id=pastillero.estado['ultimo_enfermero'])
                 except Exception as e:
                     print(f"Error al cargar enfermero de última apertura: {e}")
-        
         elif pastillero.logs_acceso:
             logs_ordenados = sorted(pastillero.logs_acceso, 
                                   key=lambda x: x['fechaHora'] if x['fechaHora'] else datetime.min,
                                   reverse=True)
-            
             ultima_apertura = logs_ordenados[0]  
             try:
                 enfermero_ultima_apertura = EnfermeroMongo.objects.get(id=ultima_apertura['enfermero_id'])
             except Exception as e:
                 print(f"Error al cargar enfermero de última apertura: {e}")
-        
     except Exception as e:
         messages.error(request, f'Pastillero no encontrado: {str(e)}')
         return redirect('enfermero_dashboard')
-    
     enfermeros_ids = [str(ref.id) for ref in pastillero.enfermeros_autorizados]
     if str(enfermero_mongo.id) not in enfermeros_ids:
         messages.error(request, 'No tienes acceso a este pastillero')
         return redirect('enfermero_dashboard')
-    
     context = {
         'pastillero': pastillero,
         'ultima_apertura': ultima_apertura,
         'ultimo_enfermero': enfermero_ultima_apertura
     }
-    
     return render(request, 'enfermero/detalle_pastillero.html', context)
 
 @login_required

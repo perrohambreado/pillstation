@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'aboutUs.css' %}">
+  <title>Sobre Nosotros | PillStation</title>
+</head>
+<body>
+  <header>
+    <div class="left">
+      <a href="{% url 'home' %}"><h2>PillStation</h2></a>
+      <div class="nav-buttons">
+        <button onclick="window.location.href='{% url 'aboutUs' %}'">Sobre Nosotros</button>
+        <button onclick="window.location.href='{% url 'services' %}'">Nuestros Servicios</button>
+      </div>
+    </div>
+    <div class="right">
+      <button class="login" onclick="window.location.href='{% url 'login' %}'">Iniciar sesión</button>
+    </div>
+  </header>
+  
+  <section class="about">
+    <div class="container">
+      <h1>Innovación en la Gestión de Medicamentos</h1>
+      <br>
+      <br>
+      <p>PillStation es una empresa dedicada al desarrollo de soluciones tecnológicas avanzadas para el sector salud, especializada en la automatización y optimización de la administración de medicamentos en entornos hospitalarios.</p>
+    </div>
+  </section>
+  
+  <section class="mission-vision">
+    <div class="container">
+      <h2>Nuestra Misión</h2>
+      <p>Optimizar la gestión y dispensación de medicamentos mediante soluciones tecnológicas innovadoras, mejorando la eficiencia operativa y la seguridad del paciente.</p>
+      <br>
+      <br>
+      <br>
+      <h2>Nuestra Visión</h2>
+      <p>Ser líder en el desarrollo e implementación de sistemas automatizados de dispensación de medicamentos, contribuyendo a la evolución de la atención médica moderna.</p>
+    </div>
+  </section>
+  
+  <section class="values">
+    <div class="container">
+      <h2>Principios y Políticas</h2>
+      <ul>
+        <li>Compromiso con la seguridad del paciente y la precisión en la administración de medicamentos.</li>
+        <li>Innovación continua en el desarrollo de soluciones tecnológicas.</li>
+        <li>Cumplimiento de estándares y regulaciones del sector salud.</li>
+        <li>Protección de datos y privacidad de la información médica.</li>
+        <li>Capacitación y actualización constante del personal.</li>
+        <li>Mejora continua de procesos y sistemas.</li>
+        <li>Colaboración estrecha con instituciones de salud para optimizar soluciones.</li>
+      </ul>
+    </div>
+  </section>
+  
+  <section class="history">
+    <div class="container">
+      <h2>Nuestra Historia</h2>
+      <p>Fundada en 2024 en Chihuahua, México, PillStation nació de la visión de tres estudiantes de la Universidad Tecnológica de Chihuahua: Emmanuel González Hernández, Ailton Eduardo Márquez Vargas y Brenda Regina Ramos Juárez. Durante sus prácticas en hospitales, identificaron la necesidad de mejorar la gestión de medicamentos y desarrollaron una solución innovadora.</p>
+      <p>Con el tiempo, la empresa ha evolucionado, enfocándose en la investigación y el desarrollo de tecnologías avanzadas como IoT, inteligencia artificial y automatización para transformar la administración hospitalaria.</p>
+    </div>
+  </section>
+  
+  <footer>
+    <p>&copy; 2025 PillStation | Todos los derechos reservados</p>
+  </footer>
+</body>
+</html>
